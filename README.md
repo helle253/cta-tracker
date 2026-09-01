@@ -24,7 +24,7 @@ The two trackers issue **separate** keys:
 ```ts
 import { getBusArrivals, getTrainArrivals } from 'cta-tracker';
 
-const train = await getTrainArrivals('40760'); // Granville, both platforms
+const train = await getTrainArrivals('30185'); // Granville platform stop id (`stpid`)
 const bus = await getBusArrivals(['14444', '1033']); // Broadway & Sheridan at Granville
 
 [...train, ...bus].forEach((a) => {
@@ -34,17 +34,15 @@ const bus = await getBusArrivals(['14444', '1033']); // Broadway & Sheridan at G
 
 Both accept the same options: `limit`, `routes`, `timeoutMs`, `fetch`.
 
-Train stop ids are interpreted by range — `4xxxx` is a parent station (every
-platform), `3xxxx` is one directional platform. Pass `{ mapid }` or `{ stpid }`
-to be explicit. Bus lookups take up to ten stop ids at once.
+Train lookups take one platform stop id (`stpid`). Bus lookups take up to ten stop ids at once.
 
 ## CLI
 
 ```sh
-node --env-file=.env dist/cli.js train 40760
+node --env-file=.env dist/cli.js train 30185
 node --env-file=.env dist/cli.js bus 14444 1033 --route 36
 node --env-file=.env dist/cli.js bus 14444 1033
-node --env-file=.env dist/cli.js train 40760 --json
+node --env-file=.env dist/cli.js train 30185 --json
 ```
 
 Multi-stop lookups are grouped under one heading per stop:

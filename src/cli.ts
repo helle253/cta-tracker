@@ -9,7 +9,7 @@ import { getTrainArrivals } from './train.js';
 const USAGE = `cta — CTA arrival lookups
 
 Usage:
-  cta train <stop-id> [options]    4xxxx station id, or 3xxxx platform id
+  cta train <stop-id> [options]    train platform stop id (stpid)
   cta bus <stop-id>... [options]   up to 10 stop ids
 
 Options:
@@ -19,7 +19,7 @@ Options:
   -h, --help            show this help
 
 Keys come from CTA_TRAIN_KEY and CTA_BUS_KEY. With a .env file:
-  node --env-file=.env dist/cli.js train 40380
+  node --env-file=.env dist/cli.js train 30185
 `;
 
 async function main(argv: string[]): Promise<number> {

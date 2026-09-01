@@ -4,14 +4,6 @@ import { buildUrl, getJson } from './http.js';
 import { minutesBetween, parseTrainTimestamp } from './time.js';
 import type { Arrival, RequestOptions } from './types.js';
 
-/**
- * Which train stop to look up.
- *
- * `mapid` is a parent station (five digits, 4xxxx) and covers every platform
- * there; `stpid` is a single directional platform (3xxxx).
- */
-export type TrainStop = { mapid: string | number } | { stpid: string | number };
-
 /** Raw `eta` entry as returned by ttarrivals with `outputType=JSON`. */
 interface RawEta {
   staId: string;
@@ -40,18 +32,6 @@ interface RawTrainResponse {
   };
 }
 
-/**
- * Interpret a bare stop identifier. CTA numbers parent stations in the 4xxxx
- * range and individual platforms in the 3xxxx range, so the id says which
- * parameter it belongs to. Pass a `TrainStop` object to be explicit.
- */
-export function toTrainStop(stop: TrainStop | string | number): TrainStop {
-  if (typeof stop === 'object') return stop;
-  const id = String(stop).trim();
-  if (!/^\d+$/.test(id)) throw new TypeError(`Train stop id must be numeric, got "${id}"`);
-  return id.startsWith('3') ? { stpid: id } : { mapid: id };
-}
-
 function toArrival(raw: RawEta, referenceTime: Date): Arrival {
   const generatedAt = parseTrainTimestamp(raw.prdt);
   const arrivalTime = parseTrainTimestamp(raw.arrT);
@@ -72,17 +52,18 @@ function toArrival(raw: RawEta, referenceTime: Date): Arrival {
 }
 
 /**
- * Arrival predictions for a train station or platform.
+ * Arrival predictions for a train platform stop id (`stpid`).
  *
  * Results are sorted soonest-first; the API does not guarantee an order when a
- * station serves several lines.
+ * platform serves several lines.
  */
-export async function getTrainArrivals(stop: TrainStop | string | number, options: RequestOptions = {}): Promise<Arrival[]> {
-  const target = toTrainStop(stop);
+export async function getTrainArrivals(stopId: string | number, options: RequestOptions = {}): Promise<Arrival[]> {
+  const stpid = String(stopId).trim();
+  if (!/^\d+$/.test(stpid)) throw new TypeError(`Train stop id must be numeric, got "${stpid}"`);
+
   const url = buildUrl(TRAIN_ARRIVALS_URL, {
     key: resolveKey('train'),
-    mapid: 'mapid' in target ? String(target.mapid) : undefined,
-    stpid: 'stpid' in target ? String(target.stpid) : undefined,
+    stpid,
     max: options.limit,
     rt: options.routes?.join(','),
     outputType: 'JSON',
