@@ -2,10 +2,9 @@
 import { parseArgs } from 'node:util';
 
 import { getBusArrivals } from './bus.js';
-import { CTA_TIMEZONE } from './config.js';
 import { CtaApiError } from './errors.js';
+import { render } from './format.js';
 import { getTrainArrivals } from './train.js';
-import type { Arrival } from './types.js';
 
 const USAGE = `cta — CTA arrival lookups
 
@@ -22,34 +21,6 @@ Options:
 Keys come from CTA_TRAIN_KEY and CTA_BUS_KEY. With a .env file:
   node --env-file=.env dist/cli.js train 40380
 `;
-
-const timeFormatter = new Intl.DateTimeFormat('en-US', {
-  timeZone: CTA_TIMEZONE,
-  hour: 'numeric',
-  minute: '2-digit',
-});
-
-function formatRow(arrival: Arrival): string {
-  const when = arrival.isApproaching ? 'Due' : `${arrival.minutesUntil} min`;
-  const flags = [
-    arrival.isDelayed ? 'delayed' : undefined,
-    arrival.isScheduled ? 'scheduled' : undefined,
-  ].filter((flag) => flag !== undefined);
-
-  const route = arrival.direction ? `${arrival.route} ${arrival.direction}` : arrival.route;
-  return [
-    when.padStart(7),
-    timeFormatter.format(arrival.arrivalTime).padStart(9),
-    `  ${route} to ${arrival.destination}`,
-    flags.length > 0 ? ` (${flags.join(', ')})` : '',
-  ].join('');
-}
-
-function render(arrivals: Arrival[]): string {
-  if (arrivals.length === 0) return 'No arrivals predicted.';
-  const header = `${arrivals[0]!.stopName}\n`;
-  return header + arrivals.map(formatRow).join('\n');
-}
 
 async function main(argv: string[]): Promise<number> {
   const { values, positionals } = parseArgs({

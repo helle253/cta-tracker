@@ -24,8 +24,8 @@ The two trackers issue **separate** keys:
 ```ts
 import { getBusArrivals, getTrainArrivals } from 'cta-tracker';
 
-const train = await getTrainArrivals('40380');        // Clark/Lake, all platforms
-const bus = await getBusArrivals('456');              // Madison & Jefferson
+const train = await getTrainArrivals('40760');            // Granville, both platforms
+const bus = await getBusArrivals(['14444', '1033']);      // Broadway & Sheridan at Granville
 
 for (const a of [...train, ...bus]) {
   console.log(`${a.route} to ${a.destination}: ${a.minutesUntil} min`);
@@ -41,15 +41,21 @@ to be explicit. Bus lookups take up to ten stop ids at once.
 ## CLI
 
 ```sh
-node --env-file=.env dist/cli.js train 40380
-node --env-file=.env dist/cli.js bus 456 --limit 5 --route 20
-node --env-file=.env dist/cli.js train 40380 --json
+node --env-file=.env dist/cli.js train 40760
+node --env-file=.env dist/cli.js bus 14444 1033 --route 36
+node --env-file=.env dist/cli.js bus 14444 1033
+node --env-file=.env dist/cli.js train 40760 --json
 ```
 
+Multi-stop lookups are grouped under one heading per stop:
+
 ```
-Clark/Lake
-    Due 8:25 PM  Brn to Kimball (scheduled)
-  9 min 8:32 PM  G to Harlem/Lake
+Sheridan & Granville
+    Due 10:06 AM  151 Southbound to Union Station
+ 10 min 10:14 AM  147 Southbound to Congress Plaza
+
+Broadway & Granville
+ 11 min 10:15 AM  36 Southbound to LaSalle Metra Station
 ```
 
 ## The `Arrival` shape
