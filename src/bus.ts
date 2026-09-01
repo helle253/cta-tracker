@@ -98,9 +98,7 @@ export async function getBusArrivals(stop: string | number | Array<string | numb
   // service, so only a response with nothing to show can be a real failure.
   if (predictions.length === 0 && errors.length > 0) {
     const fatal = errors.filter((error) => !isEmptyResultMessage(error.msg));
-    if (fatal.length > 0) {
-      throw new CtaApiError('bus', fatal.map((error) => error.msg ?? 'Unknown error').join('; '));
-    }
+    if (fatal.length > 0) throw new CtaApiError('bus', fatal.map((error) => error.msg ?? 'Unknown error').join('; '));
   }
 
   if (predictions.length === 0) return [];
