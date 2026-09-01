@@ -50,7 +50,7 @@ describe('getTrainArrivals', () => {
       stopName: 'Pulaski',
       route: 'Org',
       destination: 'Midway',
-      minutesUntil: 2,
+      minutesUntil: 1,
       isApproaching: true,
       isDelayed: true,
       isScheduled: true,
@@ -61,11 +61,24 @@ describe('getTrainArrivals', () => {
 
     expect(arrivals[1]).toMatchObject({
       destination: 'Loop',
-      minutesUntil: 9,
+      minutesUntil: 8,
       isApproaching: false,
       isScheduled: false,
       vehicleId: '726',
     });
+  });
+
+  it('counts down from the response clock, not each prediction\'s own', async () => {
+    // A busy station returns predictions generated a minute or more apart; if
+    // each counted down from its own prdt the countdowns would not be ordered.
+    const raw = fixture('train-arrivals') as any;
+    raw.ctatt.eta[0].prdt = '2015-04-30T20:20:00';
+    const { fetch } = stubFetch(raw);
+    const arrivals = await getTrainArrivals('40960', { ...KEY, fetch });
+
+    const countdowns = arrivals.map((a) => a.minutesUntil);
+    expect(countdowns).toEqual([...countdowns].sort((a, b) => a - b));
+    expect(countdowns).toEqual([1, 8]);
   });
 
   it('turns an errCd body into a CtaApiError', async () => {

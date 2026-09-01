@@ -49,7 +49,7 @@ function isEmptyResultMessage(message: string | undefined): boolean {
   return EMPTY_RESULT_MESSAGES.some((known) => text.includes(known));
 }
 
-function toArrival(raw: RawPrediction): Arrival {
+function toArrival(raw: RawPrediction, referenceTime: Date): Arrival {
   const generatedAt = parseBusTimestamp(raw.tmstmp);
   const arrivalTime = parseBusTimestamp(raw.prdtm);
   return {
@@ -59,7 +59,7 @@ function toArrival(raw: RawPrediction): Arrival {
     destination: raw.des,
     direction: raw.rtdir,
     arrivalTime,
-    minutesUntil: minutesBetween(generatedAt, arrivalTime),
+    minutesUntil: minutesBetween(referenceTime, arrivalTime),
     generatedAt,
     // "DUE" is what BusTime sends instead of a countdown under a minute.
     isApproaching: raw.prdctdn.trim().toUpperCase() === 'DUE',
@@ -113,5 +113,13 @@ export async function getBusArrivals(
     }
   }
 
-  return predictions.map(toArrival);
+  if (predictions.length === 0) return [];
+
+  // Count every prediction down from one clock — the freshest timestamp in the
+  // response — so the countdowns stay ordered. See getTrainArrivals.
+  const referenceTime = new Date(
+    Math.max(...predictions.map((prediction) => parseBusTimestamp(prediction.tmstmp).getTime())),
+  );
+
+  return predictions.map((prediction) => toArrival(prediction, referenceTime));
 }

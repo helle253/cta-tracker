@@ -39,7 +39,7 @@ function formatRow(arrival: Arrival): string {
   const route = arrival.direction ? `${arrival.route} ${arrival.direction}` : arrival.route;
   return [
     when.padStart(7),
-    timeFormatter.format(arrival.arrivalTime).padStart(8),
+    timeFormatter.format(arrival.arrivalTime).padStart(9),
     `  ${route} to ${arrival.destination}`,
     flags.length > 0 ? ` (${flags.join(', ')})` : '',
   ].join('');

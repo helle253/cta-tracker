@@ -57,7 +57,7 @@ function asArray(eta: RawEta | RawEta[] | undefined): RawEta[] {
   return Array.isArray(eta) ? eta : [eta];
 }
 
-function toArrival(raw: RawEta): Arrival {
+function toArrival(raw: RawEta, referenceTime: Date): Arrival {
   const generatedAt = parseTrainTimestamp(raw.prdt);
   const arrivalTime = parseTrainTimestamp(raw.arrT);
   return {
@@ -66,7 +66,7 @@ function toArrival(raw: RawEta): Arrival {
     route: raw.rt,
     destination: raw.destNm,
     arrivalTime,
-    minutesUntil: minutesBetween(generatedAt, arrivalTime),
+    minutesUntil: minutesBetween(referenceTime, arrivalTime),
     generatedAt,
     isApproaching: raw.isApp === '1',
     isDelayed: raw.isDly === '1',
@@ -110,7 +110,17 @@ export async function getTrainArrivals(
     });
   }
 
-  return asArray(ctatt.eta)
-    .map(toArrival)
+  const etas = asArray(ctatt.eta);
+  // Each prediction carries its own generation time, and they differ by a
+  // minute or more across a busy station. Counting down from the response's
+  // own clock instead keeps the countdowns ordered the same way the arrival
+  // times are.
+  const referenceTime =
+    ctatt.tmst !== undefined
+      ? parseTrainTimestamp(ctatt.tmst)
+      : new Date(Math.max(...etas.map((eta) => parseTrainTimestamp(eta.prdt).getTime())));
+
+  return etas
+    .map((eta) => toArrival(eta, referenceTime))
     .sort((a, b) => a.arrivalTime.getTime() - b.arrivalTime.getTime());
 }

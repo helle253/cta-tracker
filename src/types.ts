@@ -11,9 +11,14 @@ export interface Arrival {
   direction?: string;
   /** Predicted arrival/departure instant. */
   arrivalTime: Date;
-  /** Whole minutes from `generatedAt` until `arrivalTime`; floored, never negative. */
+  /**
+   * Whole minutes until `arrivalTime`, floored and never negative, measured
+   * from when the response was generated rather than from this prediction's
+   * own `generatedAt` — predictions in one response are made seconds to
+   * minutes apart, and a shared reference keeps countdowns in arrival order.
+   */
   minutesUntil: number;
-  /** When the prediction itself was generated. */
+  /** When this individual prediction was generated. */
   generatedAt: Date;
   /** Train is approaching/at the platform, or bus prediction reads "DUE". */
   isApproaching: boolean;
