@@ -11,9 +11,7 @@ describe('getBusArrivals', () => {
     await getBusArrivals([456, '457'], { ...KEY, fetch, limit: 3, routes: ['20'] });
 
     const url = new URL(calls[0]!);
-    expect(url.origin + url.pathname).toBe(
-      'https://www.ctabustracker.com/bustime/api/v3/getpredictions',
-    );
+    expect(url.origin + url.pathname).toBe('https://www.ctabustracker.com/bustime/api/v3/getpredictions');
     expect(Object.fromEntries(url.searchParams)).toEqual({
       key: 'test-key',
       stpid: '456,457',

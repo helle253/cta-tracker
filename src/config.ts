@@ -1,6 +1,5 @@
 import { CtaApiError } from './errors.js';
 
-/** All CTA timestamps are naive local time in Chicago. */
 export const CTA_TIMEZONE = 'America/Chicago';
 
 export const TRAIN_ARRIVALS_URL = 'https://lapi.transitchicago.com/api/1.0/ttarrivals.aspx';

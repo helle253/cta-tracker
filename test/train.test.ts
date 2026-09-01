@@ -68,7 +68,7 @@ describe('getTrainArrivals', () => {
     });
   });
 
-  it('counts down from the response clock, not each prediction\'s own', async () => {
+  it("counts down from the response clock, not each prediction's own", async () => {
     // A busy station returns predictions generated a minute or more apart; if
     // each counted down from its own prdt the countdowns would not be ordered.
     const raw = fixture('train-arrivals') as any;

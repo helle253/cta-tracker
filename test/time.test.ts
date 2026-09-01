@@ -1,11 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  chicagoWallClockToDate,
-  minutesBetween,
-  parseBusTimestamp,
-  parseTrainTimestamp,
-} from '../src/time.js';
+import { chicagoWallClockToDate, minutesBetween, parseBusTimestamp, parseTrainTimestamp } from '../src/time.js';
 import { chicagoTime } from './helpers.js';
 
 describe('chicagoWallClockToDate', () => {

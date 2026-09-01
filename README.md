@@ -14,18 +14,18 @@ npm run build
 
 The two trackers issue **separate** keys:
 
-| Variable | API | Where to apply |
-| --- | --- | --- |
+| Variable        | API           | Where to apply                                                 |
+| --------------- | ------------- | -------------------------------------------------------------- |
 | `CTA_TRAIN_KEY` | Train Tracker | <https://www.transitchicago.com/developers/traintrackerapply/> |
-| `CTA_BUS_KEY` | Bus Tracker | <https://www.transitchicago.com/developers/bustracker/> |
+| `CTA_BUS_KEY`   | Bus Tracker   | <https://www.transitchicago.com/developers/bustracker/>        |
 
 ## Library
 
 ```ts
 import { getBusArrivals, getTrainArrivals } from 'cta-tracker';
 
-const train = await getTrainArrivals('40760');            // Granville, both platforms
-const bus = await getBusArrivals(['14444', '1033']);      // Broadway & Sheridan at Granville
+const train = await getTrainArrivals('40760'); // Granville, both platforms
+const bus = await getBusArrivals(['14444', '1033']); // Broadway & Sheridan at Granville
 
 for (const a of [...train, ...bus]) {
   console.log(`${a.route} to ${a.destination}: ${a.minutesUntil} min`);
@@ -60,19 +60,19 @@ Broadway & Granville
 
 ## The `Arrival` shape
 
-| Field | Notes |
-| --- | --- |
-| `mode` | `'bus'` or `'train'` |
-| `stopName` | station or stop display name |
-| `route` | `"Red"`, `"Brn"`, `"20"`, `"X49"` |
-| `destination` | destination sign text |
-| `direction` | buses only (`"Westbound"`) |
-| `arrivalTime` / `generatedAt` | `Date` |
-| `minutesUntil` | floored, never negative |
-| `isApproaching` | train `isApp`, or bus countdown of `"DUE"` |
-| `isDelayed` | |
-| `isScheduled` | train only; a scheduled departure, not a live prediction |
-| `vehicleId` | train run number or bus vehicle id |
+| Field                         | Notes                                                    |
+| ----------------------------- | -------------------------------------------------------- |
+| `mode`                        | `'bus'` or `'train'`                                     |
+| `stopName`                    | station or stop display name                             |
+| `route`                       | `"Red"`, `"Brn"`, `"20"`, `"X49"`                        |
+| `destination`                 | destination sign text                                    |
+| `direction`                   | buses only (`"Westbound"`)                               |
+| `arrivalTime` / `generatedAt` | `Date`                                                   |
+| `minutesUntil`                | floored, never negative                                  |
+| `isApproaching`               | train `isApp`, or bus countdown of `"DUE"`               |
+| `isDelayed`                   |                                                          |
+| `isScheduled`                 | train only; a scheduled departure, not a live prediction |
+| `vehicleId`                   | train run number or bus vehicle id                       |
 
 ## Things the APIs do that this package smooths over
 

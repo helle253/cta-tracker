@@ -13,13 +13,10 @@ const partsFormatter = new Intl.DateTimeFormat('en-US', {
 
 /** Offset of the CTA timezone from UTC, in ms, at the given instant. */
 function zoneOffsetMs(instantMs: number): number {
-  const parts = partsFormatter.formatToParts(instantMs);
-  const get = (type: Intl.DateTimeFormatPartTypes): number => {
-    const part = parts.find((p) => p.type === type);
-    return part === undefined ? 0 : Number(part.value);
-  };
-  const asIfUtc = Date.UTC(get('year'), get('month') - 1, get('day'), get('hour'), get('minute'), get('second'));
-  return asIfUtc - instantMs;
+  const p: Record<string, number> = Object.fromEntries(
+    partsFormatter.formatToParts(instantMs).map(({ type, value }) => [type, Number(value)]),
+  );
+  return Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second) - instantMs;
 }
 
 /**
@@ -30,35 +27,27 @@ function zoneOffsetMs(instantMs: number): number {
  * settle every case except times inside the spring-forward gap, which do not
  * exist locally and land on the hour after it.
  */
-export function chicagoWallClockToDate(
-  year: number,
-  month: number,
-  day: number,
-  hour: number,
-  minute: number,
-  second = 0,
-): Date {
+export function chicagoWallClockToDate(year: number, month: number, day: number, hour: number, minute: number, second = 0): Date {
   const naiveUtc = Date.UTC(year, month - 1, day, hour, minute, second);
   const firstGuess = naiveUtc - zoneOffsetMs(naiveUtc);
-  const corrected = naiveUtc - zoneOffsetMs(firstGuess);
-  return new Date(corrected);
+  return new Date(naiveUtc - zoneOffsetMs(firstGuess));
+}
+
+const TRAIN_PATTERN = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})$/;
+const BUS_PATTERN = /^(\d{4})(\d{2})(\d{2})\s+(\d{2}):(\d{2})(?::(\d{2}))?$/;
+
+function parseTimestamp(api: 'bus' | 'train', pattern: RegExp, value: string): Date {
+  const match = pattern.exec(value.trim());
+  if (!match) throw new Error(`Unrecognized ${api} timestamp: ${value}`);
+  const [, y, mo, d, h, mi, s = '0'] = match;
+  return chicagoWallClockToDate(+y, +mo, +d, +h, +mi, +s);
 }
 
 /** Train Tracker format: `2015-04-30T20:23:32`. */
-export function parseTrainTimestamp(value: string): Date {
-  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})$/.exec(value.trim());
-  if (!match) throw new Error(`Unrecognized train timestamp: ${value}`);
-  const [, y, mo, d, h, mi, s] = match as unknown as string[];
-  return chicagoWallClockToDate(+y!, +mo!, +d!, +h!, +mi!, +s!);
-}
+export const parseTrainTimestamp = (value: string): Date => parseTimestamp('train', TRAIN_PATTERN, value);
 
 /** Bus Tracker format: `20250421 14:07` or, with `tmres=s`, `20250421 14:07:33`. */
-export function parseBusTimestamp(value: string): Date {
-  const match = /^(\d{4})(\d{2})(\d{2})\s+(\d{2}):(\d{2})(?::(\d{2}))?$/.exec(value.trim());
-  if (!match) throw new Error(`Unrecognized bus timestamp: ${value}`);
-  const [, y, mo, d, h, mi, s] = match as unknown as (string | undefined)[];
-  return chicagoWallClockToDate(+y!, +mo!, +d!, +h!, +mi!, s === undefined ? 0 : +s);
-}
+export const parseBusTimestamp = (value: string): Date => parseTimestamp('bus', BUS_PATTERN, value);
 
 /** Whole minutes between two instants, floored at zero. */
 export function minutesBetween(from: Date, to: Date): number {

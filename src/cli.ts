@@ -35,7 +35,7 @@ async function main(argv: string[]): Promise<number> {
   });
 
   const [mode, ...stops] = positionals;
-  if (values.help || mode === undefined) {
+  if (values.help || !mode) {
     process.stdout.write(USAGE);
     return values.help ? 0 : 1;
   }
@@ -54,19 +54,11 @@ async function main(argv: string[]): Promise<number> {
     return 1;
   }
 
-  const options = {
-    ...(limit === undefined ? {} : { limit }),
-    ...(values.route === undefined ? {} : { routes: values.route }),
-  };
+  const options = { limit, routes: values.route };
 
-  const arrivals =
-    mode === 'train'
-      ? await getTrainArrivals(stops[0]!, options)
-      : await getBusArrivals(stops, options);
+  const arrivals = mode === 'train' ? await getTrainArrivals(stops[0], options) : await getBusArrivals(stops, options);
 
-  process.stdout.write(
-    (values.json ? JSON.stringify(arrivals, null, 2) : render(arrivals)) + '\n',
-  );
+  process.stdout.write((values.json ? JSON.stringify(arrivals, null, 2) : render(arrivals)) + '\n');
   return 0;
 }
 
@@ -75,8 +67,7 @@ main(process.argv.slice(2))
     process.exitCode = code;
   })
   .catch((error: unknown) => {
-    const message =
-      error instanceof CtaApiError || error instanceof Error ? error.message : String(error);
+    const message = error instanceof CtaApiError || error instanceof Error ? error.message : String(error);
     process.stderr.write(`${message}\n`);
     process.exitCode = 1;
   });

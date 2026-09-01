@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 /** Records the URLs requested and replies with a canned body. */
 export function stubFetch(body: unknown, init: { status?: number; text?: string } = {}) {
   const calls: string[] = [];
-  const fetch = (async (input: RequestInfo | URL) => {
+  const fetch = (async (input: Parameters<typeof globalThis.fetch>[0]) => {
     calls.push(String(input));
     return new Response(init.text ?? JSON.stringify(body), {
       status: init.status ?? 200,

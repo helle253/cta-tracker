@@ -60,7 +60,7 @@ describe('render', () => {
         isApproaching: true,
         isDelayed: true,
         isScheduled: true,
-        ...({ direction: undefined } as Partial<Arrival>),
+        direction: undefined,
       }),
     ]);
     expect(out).toContain('    Due 10:15 AM  Red to 95th/Dan Ryan (delayed, scheduled)');

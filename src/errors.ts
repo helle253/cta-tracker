@@ -2,15 +2,11 @@
 export class CtaApiError extends Error {
   readonly api: 'bus' | 'train';
   /** The API's own error code, when it supplies one (train `errCd`). */
-  readonly code: string | undefined;
-  readonly status: number | undefined;
+  readonly code?: string;
+  readonly status?: number;
 
-  constructor(
-    api: 'bus' | 'train',
-    message: string,
-    options: { code?: string; status?: number; cause?: unknown } = {},
-  ) {
-    super(message, options.cause === undefined ? undefined : { cause: options.cause });
+  constructor(api: 'bus' | 'train', message: string, options: { code?: string; status?: number; cause?: unknown } = {}) {
+    super(message, options);
     this.name = 'CtaApiError';
     this.api = api;
     this.code = options.code;

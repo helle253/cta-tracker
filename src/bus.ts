@@ -38,11 +38,7 @@ interface RawBusResponse {
  * Messages the API returns in its `error` array that simply mean "nothing is
  * coming right now". They are a normal outcome, not a failure.
  */
-const EMPTY_RESULT_MESSAGES = [
-  'no service scheduled',
-  'no arrival times',
-  'no data found for parameter',
-];
+const EMPTY_RESULT_MESSAGES = ['no service scheduled', 'no arrival times', 'no data found for parameter'];
 
 function isEmptyResultMessage(message: string | undefined): boolean {
   const text = (message ?? '').toLowerCase();
@@ -65,7 +61,7 @@ function toArrival(raw: RawPrediction, referenceTime: Date): Arrival {
     isApproaching: raw.prdctdn.trim().toUpperCase() === 'DUE',
     isDelayed: raw.dly === true || raw.dly === 'true',
     isScheduled: false,
-    ...(raw.vid ? { vehicleId: raw.vid } : {}),
+    vehicleId: raw.vid || undefined,
   };
 }
 
@@ -75,10 +71,7 @@ function toArrival(raw: RawPrediction, referenceTime: Date): Arrival {
  * The API already returns predictions in ascending time order across all
  * requested stops.
  */
-export async function getBusArrivals(
-  stop: string | number | Array<string | number>,
-  options: RequestOptions = {},
-): Promise<Arrival[]> {
+export async function getBusArrivals(stop: string | number | Array<string | number>, options: RequestOptions = {}): Promise<Arrival[]> {
   const stopIds = (Array.isArray(stop) ? stop : [stop]).map((id) => String(id).trim());
   if (stopIds.length === 0) throw new TypeError('At least one bus stop id is required');
   if (stopIds.length > MAX_BUS_STOPS) {
@@ -93,10 +86,7 @@ export async function getBusArrivals(
     format: 'json',
   });
 
-  const body = await getJson<RawBusResponse>('bus', url, {
-    ...(options.timeoutMs === undefined ? {} : { timeoutMs: options.timeoutMs }),
-    ...(options.fetch === undefined ? {} : { fetch: options.fetch }),
-  });
+  const body = await getJson<RawBusResponse>('bus', url, { timeoutMs: options.timeoutMs, fetch: options.fetch });
 
   const response = body['bustime-response'];
   if (!response) throw new CtaApiError('bus', 'Malformed response: missing bustime-response element');
@@ -117,9 +107,7 @@ export async function getBusArrivals(
 
   // Count every prediction down from one clock — the freshest timestamp in the
   // response — so the countdowns stay ordered. See getTrainArrivals.
-  const referenceTime = new Date(
-    Math.max(...predictions.map((prediction) => parseBusTimestamp(prediction.tmstmp).getTime())),
-  );
+  const referenceTime = new Date(Math.max(...predictions.map((prediction) => parseBusTimestamp(prediction.tmstmp).getTime())));
 
   return predictions.map((prediction) => toArrival(prediction, referenceTime));
 }

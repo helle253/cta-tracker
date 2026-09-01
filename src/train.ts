@@ -52,11 +52,6 @@ export function toTrainStop(stop: TrainStop | string | number): TrainStop {
   return id.startsWith('3') ? { stpid: id } : { mapid: id };
 }
 
-function asArray(eta: RawEta | RawEta[] | undefined): RawEta[] {
-  if (eta === undefined) return [];
-  return Array.isArray(eta) ? eta : [eta];
-}
-
 function toArrival(raw: RawEta, referenceTime: Date): Arrival {
   const generatedAt = parseTrainTimestamp(raw.prdt);
   const arrivalTime = parseTrainTimestamp(raw.arrT);
@@ -72,7 +67,7 @@ function toArrival(raw: RawEta, referenceTime: Date): Arrival {
     isDelayed: raw.isDly === '1',
     isScheduled: raw.isSch === '1',
     // Schedule-based entries report run number "0" — there is no train yet.
-    ...(raw.rn && raw.rn !== '0' ? { vehicleId: raw.rn } : {}),
+    vehicleId: raw.rn && raw.rn !== '0' ? raw.rn : undefined,
   };
 }
 
@@ -82,10 +77,7 @@ function toArrival(raw: RawEta, referenceTime: Date): Arrival {
  * Results are sorted soonest-first; the API does not guarantee an order when a
  * station serves several lines.
  */
-export async function getTrainArrivals(
-  stop: TrainStop | string | number,
-  options: RequestOptions = {},
-): Promise<Arrival[]> {
+export async function getTrainArrivals(stop: TrainStop | string | number, options: RequestOptions = {}): Promise<Arrival[]> {
   const target = toTrainStop(stop);
   const url = buildUrl(TRAIN_ARRIVALS_URL, {
     key: resolveKey('train', options.key),
@@ -96,10 +88,7 @@ export async function getTrainArrivals(
     outputType: 'JSON',
   });
 
-  const body = await getJson<RawTrainResponse>('train', url, {
-    ...(options.timeoutMs === undefined ? {} : { timeoutMs: options.timeoutMs }),
-    ...(options.fetch === undefined ? {} : { fetch: options.fetch }),
-  });
+  const body = await getJson<RawTrainResponse>('train', url, { timeoutMs: options.timeoutMs, fetch: options.fetch });
 
   const ctatt = body.ctatt;
   if (!ctatt) throw new CtaApiError('train', 'Malformed response: missing ctatt element');
@@ -110,7 +99,7 @@ export async function getTrainArrivals(
     });
   }
 
-  const etas = asArray(ctatt.eta);
+  const etas = [ctatt.eta ?? []].flat();
   // Each prediction carries its own generation time, and they differ by a
   // minute or more across a busy station. Counting down from the response's
   // own clock instead keeps the countdowns ordered the same way the arrival
@@ -120,7 +109,5 @@ export async function getTrainArrivals(
       ? parseTrainTimestamp(ctatt.tmst)
       : new Date(Math.max(...etas.map((eta) => parseTrainTimestamp(eta.prdt).getTime())));
 
-  return etas
-    .map((eta) => toArrival(eta, referenceTime))
-    .sort((a, b) => a.arrivalTime.getTime() - b.arrivalTime.getTime());
+  return etas.map((eta) => toArrival(eta, referenceTime)).sort((a, b) => a.arrivalTime.getTime() - b.arrivalTime.getTime());
 }

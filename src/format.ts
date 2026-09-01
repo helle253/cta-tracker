@@ -9,10 +9,9 @@ const timeFormatter = new Intl.DateTimeFormat('en-US', {
 
 function formatRow(arrival: Arrival): string {
   const when = arrival.isApproaching ? 'Due' : `${arrival.minutesUntil} min`;
-  const flags = [
-    arrival.isDelayed ? 'delayed' : undefined,
-    arrival.isScheduled ? 'scheduled' : undefined,
-  ].filter((flag) => flag !== undefined);
+  const flags = [arrival.isDelayed ? 'delayed' : undefined, arrival.isScheduled ? 'scheduled' : undefined].filter(
+    (flag) => flag !== undefined,
+  );
 
   const route = arrival.direction ? `${arrival.route} ${arrival.direction}` : arrival.route;
   return [
@@ -33,14 +32,7 @@ function formatRow(arrival: Arrival): string {
 export function render(arrivals: Arrival[]): string {
   if (arrivals.length === 0) return 'No arrivals predicted.';
 
-  const byStop = new Map<string, Arrival[]>();
-  for (const arrival of arrivals) {
-    const group = byStop.get(arrival.stopName);
-    if (group === undefined) byStop.set(arrival.stopName, [arrival]);
-    else group.push(arrival);
-  }
+  const byStop = Map.groupBy(arrivals, (arrival) => arrival.stopName);
 
-  return [...byStop]
-    .map(([stopName, group]) => [stopName, ...group.map(formatRow)].join('\n'))
-    .join('\n\n');
+  return [...byStop].map(([stopName, group]) => [stopName, ...group.map(formatRow)].join('\n')).join('\n\n');
 }
