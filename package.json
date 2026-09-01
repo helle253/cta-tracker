@@ -11,8 +11,11 @@
     "worker"
   ],
   "scripts": {
+    "build": "yarn workspaces foreach -Apt run build",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "test": "yarn workspaces foreach -Apt run test",
+    "typecheck": "yarn workspaces foreach -Apt run typecheck"
   },
   "license": "MIT",
   "devDependencies": {
