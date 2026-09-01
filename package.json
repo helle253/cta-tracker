@@ -1,6 +1,7 @@
 {
   "name": "cta-tracker",
   "version": "0.1.0",
+  "licence": "MIT",
   "private": true,
   "description": "Look up CTA bus and train arrivals for a given stop.",
   "engines": {
