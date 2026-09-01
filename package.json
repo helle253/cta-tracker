@@ -1,6 +1,7 @@
 {
   "name": "cta-tracker",
   "version": "0.1.0",
+  "private": true,
   "description": "Look up CTA bus and train arrivals for a given stop.",
   "engines": {
     "node": ">=24"
@@ -16,10 +17,10 @@
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^26.4.0",
-    "prettier": "^3.8.4",
-    "tsx": "^4.19.2",
-    "typescript": "^5.7.2",
-    "vitest": "^2.1.8"
+    "prettier": "^3.9.6",
+    "tsx": "^4.23.13",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.11"
   },
-  "packageManager": "yarn@4.9.4"
+  "packageManager": "yarn@4.18.0"
 }

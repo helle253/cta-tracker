@@ -1,7 +1,6 @@
 {
   "name": "@cta-tracker/worker",
   "version": "0.0.1",
-  "private": true,
   "scripts": {
     "build": "yarn workspace @cta-tracker/lib build",
     "dev": "wrangler dev",
@@ -14,8 +13,6 @@
     "@cta-tracker/lib": "workspace:^"
   },
   "devDependencies": {
-    "typescript": "^5.7.2",
-    "vitest": "^2.1.8",
-    "wrangler": "^4.119.0"
+    "wrangler": "^4.128.0"
   }
 }
