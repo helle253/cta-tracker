@@ -13,6 +13,7 @@
     "@cta-tracker/lib": "workspace:^"
   },
   "devDependencies": {
+    "typescript": "^7.0.2",
     "wrangler": "^4.128.0"
   }
 }

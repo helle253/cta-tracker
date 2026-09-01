@@ -72,6 +72,8 @@ __metadata:
 "@cta-tracker/lib@workspace:^, @cta-tracker/lib@workspace:lib":
   version: 0.0.0-use.local
   resolution: "@cta-tracker/lib@workspace:lib"
+  dependencies:
+    typescript: "npm:^7.0.2"
   bin:
     cta: ./dist/cli.js
   languageName: unknown
@@ -82,6 +84,7 @@ __metadata:
   resolution: "@cta-tracker/worker@workspace:worker"
   dependencies:
     "@cta-tracker/lib": "workspace:^"
+    typescript: "npm:^7.0.2"
     wrangler: "npm:^4.128.0"
   languageName: unknown
   linkType: soft
