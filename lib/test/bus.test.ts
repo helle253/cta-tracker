@@ -3,10 +3,6 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { getBusArrivals } from '../src/bus.js';
 import { chicagoTime, fixture, stubFetch } from './helpers.js';
 
-beforeEach(() => {
-  process.env.CTA_BUS_KEY = 'test-key';
-});
-
 describe('getBusArrivals', () => {
   it('requests JSON predictions for the given stops', async () => {
     const { fetch, calls } = stubFetch(fixture('bus-predictions'));

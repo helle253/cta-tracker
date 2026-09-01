@@ -3,13 +3,12 @@
     "declaration": true,
     "lib": ["ES2024"],
     "module": "NodeNext",
+    "noEmit": true,
     "outDir": "dist",
-    "rootDir": "src",
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
     "target": "ES2023",
     "types": ["node"]
-  },
-  "include": ["src/**/*.ts"]
+  }
 }

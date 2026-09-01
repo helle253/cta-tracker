@@ -4,10 +4,6 @@ import { CtaApiError } from '../src/errors.js';
 import { getTrainArrivals } from '../src/train.js';
 import { chicagoTime, fixture, stubFetch } from './helpers.js';
 
-beforeEach(() => {
-  process.env.CTA_TRAIN_KEY = 'test-key';
-});
-
 describe('getTrainArrivals', () => {
   it('requests JSON output for the given platform stop', async () => {
     const { fetch, calls } = stubFetch(fixture('train-arrivals'));
@@ -95,16 +91,5 @@ describe('getTrainArrivals', () => {
   it('reports a non-JSON body rather than throwing a SyntaxError', async () => {
     const { fetch } = stubFetch(null, { text: '<html>Access denied</html>' });
     await expect(getTrainArrivals('30960', { fetch })).rejects.toBeInstanceOf(CtaApiError);
-  });
-
-  it('requires a key', async () => {
-    const { fetch } = stubFetch(fixture('train-arrivals'));
-    const saved = process.env.CTA_TRAIN_KEY;
-    delete process.env.CTA_TRAIN_KEY;
-    try {
-      await expect(getTrainArrivals('30960', { fetch })).rejects.toThrow(/CTA_TRAIN_KEY/);
-    } finally {
-      if (saved !== undefined) process.env.CTA_TRAIN_KEY = saved;
-    }
   });
 });

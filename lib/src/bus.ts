@@ -71,7 +71,11 @@ function toArrival(raw: RawPrediction, referenceTime: Date): Arrival {
  * The API already returns predictions in ascending time order across all
  * requested stops.
  */
-export async function getBusArrivals(stop: string | number | Array<string | number>, options: RequestOptions = {}): Promise<Arrival[]> {
+export async function getBusArrivalsForKey(
+  stop: string | number | Array<string | number>,
+  key: string,
+  options: RequestOptions = {},
+): Promise<Arrival[]> {
   const stopIds = (Array.isArray(stop) ? stop : [stop]).map((id) => String(id).trim());
   if (stopIds.length === 0) throw new TypeError('At least one bus stop id is required');
   if (stopIds.length > MAX_BUS_STOPS) {
@@ -79,7 +83,7 @@ export async function getBusArrivals(stop: string | number | Array<string | numb
   }
 
   const url = buildUrl(BUS_PREDICTIONS_URL, {
-    key: resolveKey('bus'),
+    key,
     stpid: stopIds.join(','),
     rt: options.routes?.join(','),
     top: options.limit,
@@ -108,4 +112,8 @@ export async function getBusArrivals(stop: string | number | Array<string | numb
   const referenceTime = new Date(Math.max(...predictions.map((prediction) => parseBusTimestamp(prediction.tmstmp).getTime())));
 
   return predictions.map((prediction) => toArrival(prediction, referenceTime));
+}
+
+export async function getBusArrivals(stop: string | number | Array<string | number>, options: RequestOptions = {}): Promise<Arrival[]> {
+  return getBusArrivalsForKey(stop, resolveKey('bus'), options);
 }

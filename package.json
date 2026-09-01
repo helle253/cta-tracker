@@ -2,33 +2,17 @@
   "name": "cta-tracker",
   "version": "0.1.0",
   "description": "Look up CTA bus and train arrivals for a given stop.",
-  "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    }
-  },
-  "bin": {
-    "cta": "./dist/cli.js"
-  },
   "engines": {
-    "node": ">=22"
+    "node": ">=24"
   },
-  "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "dev": "tsx src/cli.ts",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "typecheck": "tsc -p tsconfig.test.json"
-  },
-  "files": [
-    "dist"
+  "workspaces": [
+    "lib",
+    "worker"
   ],
+  "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^26.4.0",

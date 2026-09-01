@@ -57,12 +57,12 @@ function toArrival(raw: RawEta, referenceTime: Date): Arrival {
  * Results are sorted soonest-first; the API does not guarantee an order when a
  * platform serves several lines.
  */
-export async function getTrainArrivals(stopId: string | number, options: RequestOptions = {}): Promise<Arrival[]> {
+export async function getTrainArrivalsForKey(stopId: string | number, key: string, options: RequestOptions = {}): Promise<Arrival[]> {
   const stpid = String(stopId).trim();
   if (!/^\d+$/.test(stpid)) throw new TypeError(`Train stop id must be numeric, got "${stpid}"`);
 
   const url = buildUrl(TRAIN_ARRIVALS_URL, {
-    key: resolveKey('train'),
+    key,
     stpid,
     max: options.limit,
     rt: options.routes?.join(','),
@@ -91,4 +91,8 @@ export async function getTrainArrivals(stopId: string | number, options: Request
       : new Date(Math.max(...etas.map((eta) => parseTrainTimestamp(eta.prdt).getTime())));
 
   return etas.map((eta) => toArrival(eta, referenceTime)).sort((a, b) => a.arrivalTime.getTime() - b.arrivalTime.getTime());
+}
+
+export async function getTrainArrivals(stopId: string | number, options: RequestOptions = {}): Promise<Arrival[]> {
+  return getTrainArrivalsForKey(stopId, resolveKey('train'), options);
 }
