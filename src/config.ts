@@ -12,7 +12,7 @@ const ENV_VAR = { train: 'CTA_TRAIN_KEY', bus: 'CTA_BUS_KEY' } as const;
 
 export function resolveKey(api: TransitOption): string {
   const key = process.env[ENV_VAR[api]];
-  if (!key) throw new CtaApiError(api, `Missing ${api} API key`);
+  if (!key) throw new CtaApiError(api, `Missing ${ENV_VAR[api]}`);
 
   return key;
 }

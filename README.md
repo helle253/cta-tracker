@@ -32,7 +32,7 @@ for (const a of [...train, ...bus]) {
 }
 ```
 
-Both accept the same options: `key`, `limit`, `routes`, `timeoutMs`, `fetch`.
+Both accept the same options: `limit`, `routes`, `timeoutMs`, `fetch`.
 
 Train stop ids are interpreted by range — `4xxxx` is a parent station (every
 platform), `3xxxx` is one directional platform. Pass `{ mapid }` or `{ stpid }`

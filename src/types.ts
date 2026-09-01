@@ -32,8 +32,6 @@ export interface Arrival {
 }
 
 export interface RequestOptions {
-  /** Override the key from the environment. */
-  key?: string;
   /** Limit the number of predictions returned. */
   limit?: number;
   /** Restrict to one or more routes. */
