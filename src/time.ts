@@ -1,4 +1,5 @@
 import { CTA_TIMEZONE } from './config.js';
+import { TransitOption } from './types.js';
 
 const partsFormatter = new Intl.DateTimeFormat('en-US', {
   timeZone: CTA_TIMEZONE,
@@ -36,7 +37,7 @@ export function chicagoWallClockToDate(year: number, month: number, day: number,
 const TRAIN_PATTERN = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})$/;
 const BUS_PATTERN = /^(\d{4})(\d{2})(\d{2})\s+(\d{2}):(\d{2})(?::(\d{2}))?$/;
 
-function parseTimestamp(api: 'bus' | 'train', pattern: RegExp, value: string): Date {
+function parseTimestamp(api: TransitOption, pattern: RegExp, value: string): Date {
   const match = pattern.exec(value.trim());
   if (!match) throw new Error(`Unrecognized ${api} timestamp: ${value}`);
   const [, y, mo, d, h, mi, s = '0'] = match;

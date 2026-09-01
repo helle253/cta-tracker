@@ -80,7 +80,7 @@ function toArrival(raw: RawEta, referenceTime: Date): Arrival {
 export async function getTrainArrivals(stop: TrainStop | string | number, options: RequestOptions = {}): Promise<Arrival[]> {
   const target = toTrainStop(stop);
   const url = buildUrl(TRAIN_ARRIVALS_URL, {
-    key: resolveKey('train', options.key),
+    key: resolveKey('train'),
     mapid: 'mapid' in target ? String(target.mapid) : undefined,
     stpid: 'stpid' in target ? String(target.stpid) : undefined,
     max: options.limit,

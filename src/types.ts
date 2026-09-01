@@ -1,6 +1,8 @@
+export type TransitOption = 'bus' | 'train';
+
 /** A single predicted arrival, normalized across the bus and train APIs. */
 export interface Arrival {
-  mode: 'bus' | 'train';
+  mode: TransitOption;
   /** Human-readable stop or station name, as the API reports it. */
   stopName: string;
   /** Route designator: "Red", "Brn" for trains; "22", "X49" for buses. */

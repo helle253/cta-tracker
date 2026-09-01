@@ -79,7 +79,7 @@ export async function getBusArrivals(stop: string | number | Array<string | numb
   }
 
   const url = buildUrl(BUS_PREDICTIONS_URL, {
-    key: resolveKey('bus', options.key),
+    key: resolveKey('bus'),
     stpid: stopIds.join(','),
     rt: options.routes?.join(','),
     top: options.limit,

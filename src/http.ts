@@ -1,5 +1,6 @@
 import { DEFAULT_TIMEOUT_MS } from './config.js';
 import { CtaApiError } from './errors.js';
+import { TransitOption } from './types.js';
 
 export type QueryValue = string | number | boolean | undefined;
 
@@ -18,7 +19,7 @@ export interface GetJsonOptions {
 }
 
 /** GET a URL and parse JSON, translating transport and parse failures into CtaApiError. */
-export async function getJson<T>(api: 'bus' | 'train', url: string, options: GetJsonOptions = {}): Promise<T> {
+export async function getJson<T>(api: TransitOption, url: string, options: GetJsonOptions = {}): Promise<T> {
   const doFetch = options.fetch ?? globalThis.fetch;
   const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
 
