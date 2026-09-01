@@ -1,0 +1,54 @@
+{
+  "bustime-response": {
+    "prd": [
+      {
+        "tmstmp": "20250421 16:04",
+        "typ": "A",
+        "stpnm": "Madison & Jefferson",
+        "stpid": "456",
+        "vid": "8184",
+        "dstp": 686,
+        "rt": "20",
+        "rtdd": "20",
+        "rtdir": "Westbound",
+        "des": "Austin",
+        "prdtm": "20250421 16:04",
+        "tablockid": "20 -803",
+        "tatripid": "1040713",
+        "origtatripno": "262522629",
+        "dly": false,
+        "dyn": 0,
+        "prdctdn": "DUE",
+        "zone": "",
+        "psgld": "",
+        "stst": 57120,
+        "stsd": "2025-04-21",
+        "flagstop": 0
+      },
+      {
+        "tmstmp": "20250421 16:04",
+        "typ": "A",
+        "stpnm": "Madison & Jefferson",
+        "stpid": "456",
+        "vid": "1295",
+        "dstp": 9120,
+        "rt": "20",
+        "rtdd": "20",
+        "rtdir": "Westbound",
+        "des": "Austin",
+        "prdtm": "20250421 16:16",
+        "tablockid": "20 -805",
+        "tatripid": "1040714",
+        "origtatripno": "262522630",
+        "dly": true,
+        "dyn": 0,
+        "prdctdn": "12",
+        "zone": "",
+        "psgld": "HALF_EMPTY",
+        "stst": 57840,
+        "stsd": "2025-04-21",
+        "flagstop": 0
+      }
+    ]
+  }
+}

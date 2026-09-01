@@ -1,0 +1,111 @@
+#!/usr/bin/env node
+import { parseArgs } from 'node:util';
+
+import { getBusArrivals } from './bus.js';
+import { CTA_TIMEZONE } from './config.js';
+import { CtaApiError } from './errors.js';
+import { getTrainArrivals } from './train.js';
+import type { Arrival } from './types.js';
+
+const USAGE = `cta — CTA arrival lookups
+
+Usage:
+  cta train <stop-id> [options]    4xxxx station id, or 3xxxx platform id
+  cta bus <stop-id>... [options]   up to 10 stop ids
+
+Options:
+  -n, --limit <n>       maximum predictions to return
+  -r, --route <route>   restrict to a route (repeatable)
+      --json            print raw JSON instead of a table
+  -h, --help            show this help
+
+Keys come from CTA_TRAIN_KEY and CTA_BUS_KEY. With a .env file:
+  node --env-file=.env dist/cli.js train 40380
+`;
+
+const timeFormatter = new Intl.DateTimeFormat('en-US', {
+  timeZone: CTA_TIMEZONE,
+  hour: 'numeric',
+  minute: '2-digit',
+});
+
+function formatRow(arrival: Arrival): string {
+  const when = arrival.isApproaching ? 'Due' : `${arrival.minutesUntil} min`;
+  const flags = [
+    arrival.isDelayed ? 'delayed' : undefined,
+    arrival.isScheduled ? 'scheduled' : undefined,
+  ].filter((flag) => flag !== undefined);
+
+  const route = arrival.direction ? `${arrival.route} ${arrival.direction}` : arrival.route;
+  return [
+    when.padStart(7),
+    timeFormatter.format(arrival.arrivalTime).padStart(8),
+    `  ${route} to ${arrival.destination}`,
+    flags.length > 0 ? ` (${flags.join(', ')})` : '',
+  ].join('');
+}
+
+function render(arrivals: Arrival[]): string {
+  if (arrivals.length === 0) return 'No arrivals predicted.';
+  const header = `${arrivals[0]!.stopName}\n`;
+  return header + arrivals.map(formatRow).join('\n');
+}
+
+async function main(argv: string[]): Promise<number> {
+  const { values, positionals } = parseArgs({
+    args: argv,
+    allowPositionals: true,
+    options: {
+      limit: { type: 'string', short: 'n' },
+      route: { type: 'string', short: 'r', multiple: true },
+      json: { type: 'boolean', default: false },
+      help: { type: 'boolean', short: 'h', default: false },
+    },
+  });
+
+  const [mode, ...stops] = positionals;
+  if (values.help || mode === undefined) {
+    process.stdout.write(USAGE);
+    return values.help ? 0 : 1;
+  }
+  if (mode !== 'bus' && mode !== 'train') {
+    process.stderr.write(`Unknown mode "${mode}". Expected "bus" or "train".\n`);
+    return 1;
+  }
+  if (stops.length === 0) {
+    process.stderr.write(`Missing stop id. See --help.\n`);
+    return 1;
+  }
+
+  const limit = values.limit === undefined ? undefined : Number(values.limit);
+  if (limit !== undefined && (!Number.isInteger(limit) || limit < 1)) {
+    process.stderr.write(`--limit must be a positive integer.\n`);
+    return 1;
+  }
+
+  const options = {
+    ...(limit === undefined ? {} : { limit }),
+    ...(values.route === undefined ? {} : { routes: values.route }),
+  };
+
+  const arrivals =
+    mode === 'train'
+      ? await getTrainArrivals(stops[0]!, options)
+      : await getBusArrivals(stops, options);
+
+  process.stdout.write(
+    (values.json ? JSON.stringify(arrivals, null, 2) : render(arrivals)) + '\n',
+  );
+  return 0;
+}
+
+main(process.argv.slice(2))
+  .then((code) => {
+    process.exitCode = code;
+  })
+  .catch((error: unknown) => {
+    const message =
+      error instanceof CtaApiError || error instanceof Error ? error.message : String(error);
+    process.stderr.write(`${message}\n`);
+    process.exitCode = 1;
+  });
