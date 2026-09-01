@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { parseArgs } from 'node:util';
+import { env } from 'node:process';
 
 import { getBusArrivals } from './bus.js';
 import { CtaApiError } from './errors.js';
@@ -34,6 +35,11 @@ async function main(argv: string[]): Promise<number> {
     },
   });
 
+  const TRAIN_API_KEY = env.CTA_TRAIN_KEY;
+  if (!TRAIN_API_KEY) throw new Error('missing CTA_TRAIN_KEY');
+  const BUS_API_KEY = env.CTA_BUS_KEY;
+  if (!BUS_API_KEY) throw new Error('missing BUS_API_KEY');
+
   const [mode, ...stops] = positionals;
   if (values.help || !mode) {
     process.stdout.write(USAGE);
@@ -56,7 +62,8 @@ async function main(argv: string[]): Promise<number> {
 
   const options = { limit, routes: values.route };
 
-  const arrivals = mode === 'train' ? await getTrainArrivals(stops[0], options) : await getBusArrivals(stops, options);
+  const arrivals =
+    mode === 'train' ? await getTrainArrivals(stops[0], TRAIN_API_KEY, options) : await getBusArrivals(stops, BUS_API_KEY, options);
 
   process.stdout.write((values.json ? JSON.stringify(arrivals, null, 2) : render(arrivals)) + '\n');
   return 0;

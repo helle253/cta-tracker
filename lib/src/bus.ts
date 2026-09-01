@@ -1,4 +1,4 @@
-import { BUS_PREDICTIONS_URL, resolveKey } from './config.js';
+import { BUS_PREDICTIONS_URL } from './config.js';
 import { CtaApiError } from './errors.js';
 import { buildUrl, getJson } from './http.js';
 import { minutesBetween, parseBusTimestamp } from './time.js';
@@ -71,7 +71,7 @@ function toArrival(raw: RawPrediction, referenceTime: Date): Arrival {
  * The API already returns predictions in ascending time order across all
  * requested stops.
  */
-export async function getBusArrivalsForKey(
+export async function getBusArrivals(
   stop: string | number | Array<string | number>,
   key: string,
   options: RequestOptions = {},
@@ -112,8 +112,4 @@ export async function getBusArrivalsForKey(
   const referenceTime = new Date(Math.max(...predictions.map((prediction) => parseBusTimestamp(prediction.tmstmp).getTime())));
 
   return predictions.map((prediction) => toArrival(prediction, referenceTime));
-}
-
-export async function getBusArrivals(stop: string | number | Array<string | number>, options: RequestOptions = {}): Promise<Arrival[]> {
-  return getBusArrivalsForKey(stop, resolveKey('bus'), options);
 }

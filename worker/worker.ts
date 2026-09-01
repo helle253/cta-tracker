@@ -1,4 +1,4 @@
-import { CtaApiError, getBusArrivalsForKey, getTrainArrivalsForKey } from '@cta-tracker/lib';
+import { CtaApiError, getBusArrivals, getTrainArrivals } from '@cta-tracker/lib';
 import type { Arrival, TransitOption } from '@cta-tracker/lib';
 
 const CACHE_TTL_SECONDS = 60;
@@ -96,8 +96,8 @@ function writeCachedStop(request: Request, body: CachedStopEntry, ctx: Execution
 async function fetchUnfilteredStop(mode: TransitOption, stopId: string, env: Env): Promise<CachedStopEntry> {
   const arrivals =
     mode === 'train'
-      ? await getTrainArrivalsForKey(stopId, env.CTA_TRAIN_KEY, { limit: CTA_FETCH_LIMIT })
-      : await getBusArrivalsForKey(stopId, env.CTA_BUS_KEY, { limit: CTA_FETCH_LIMIT });
+      ? await getTrainArrivals(stopId, env.CTA_TRAIN_KEY, { limit: CTA_FETCH_LIMIT })
+      : await getBusArrivals(stopId, env.CTA_BUS_KEY, { limit: CTA_FETCH_LIMIT });
 
   return { fetchedAt: new Date().toISOString(), arrivals };
 }
