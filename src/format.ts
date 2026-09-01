@@ -32,7 +32,10 @@ function formatRow(arrival: Arrival): string {
 export function render(arrivals: Arrival[]): string {
   if (arrivals.length === 0) return 'No arrivals predicted.';
 
-  const byStop = Map.groupBy(arrivals, (arrival) => arrival.stopName);
+  const byStop = arrivals.reduce(
+    (groups, arrival) => new Map(groups).set(arrival.stopName, [...(groups.get(arrival.stopName) ?? []), arrival]),
+    new Map<string, Arrival[]>(),
+  );
 
   return [...byStop].map(([stopName, group]) => [stopName, ...group.map(formatRow)].join('\n')).join('\n\n');
 }

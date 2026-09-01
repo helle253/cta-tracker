@@ -27,9 +27,9 @@ import { getBusArrivals, getTrainArrivals } from 'cta-tracker';
 const train = await getTrainArrivals('40760'); // Granville, both platforms
 const bus = await getBusArrivals(['14444', '1033']); // Broadway & Sheridan at Granville
 
-for (const a of [...train, ...bus]) {
+[...train, ...bus].forEach((a) => {
   console.log(`${a.route} to ${a.destination}: ${a.minutesUntil} min`);
-}
+});
 ```
 
 Both accept the same options: `limit`, `routes`, `timeoutMs`, `fetch`.
