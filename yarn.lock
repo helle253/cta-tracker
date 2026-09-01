@@ -74,6 +74,7 @@ __metadata:
   resolution: "@cta-tracker/lib@workspace:lib"
   dependencies:
     typescript: "npm:^7.0.2"
+    vitest: "npm:^4.1.11"
   bin:
     cta: ./dist/cli.js
   languageName: unknown
@@ -85,6 +86,7 @@ __metadata:
   dependencies:
     "@cta-tracker/lib": "workspace:^"
     typescript: "npm:^7.0.2"
+    vitest: "npm:^4.1.11"
     wrangler: "npm:^4.128.0"
   languageName: unknown
   linkType: soft
