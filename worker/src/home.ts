@@ -1,5 +1,5 @@
 import type { Arrival, TransitOption } from '@cta-tracker/lib';
-import { STOPS } from './constants';
+import { LINE_DATA, STOPS } from './constants';
 
 const REFRESH_SECONDS = 45;
 
@@ -10,9 +10,19 @@ function minutesUntil(arrival: Arrival): string {
   return `${Math.max(0, Math.floor((arrival.arrivalTime.getTime() - Date.now()) / 60_000))} min`;
 }
 
+function renderIcon(arrival: Arrival): string {
+  if (arrival.mode === 'bus') {
+    return `<span aria-hidden="true" style="margin-right: 0.35rem;">🚌</span>`;
+  }
+
+  const lineInfo = LINE_DATA[arrival.route.toLowerCase()] ?? LINE_DATA['unknown'];
+
+  return `<span role="img" aria-label="${arrival.route}" style="color: ${lineInfo.color}; margin-right: 0.35rem;">■</span>`;
+}
+
 function renderArrival(arrival: Arrival): string {
   const route = arrival.direction ? `${arrival.route} ${arrival.direction}` : arrival.route;
-  return `<li>${minutesUntil(arrival)}: ${route} to ${arrival.destination}</li>`;
+  return `<li>${renderIcon(arrival)}<span>${arrival.destination} - ${minutesUntil(arrival)}</span></li>`;
 }
 
 export async function handleHome(getArrivals: GetArrivals): Promise<Response> {
