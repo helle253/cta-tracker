@@ -1,11 +1,7 @@
 import type { Arrival, TransitOption } from '@cta-tracker/lib';
+import { STOPS } from './constants';
 
 const REFRESH_SECONDS = 45;
-const STOPS: Array<[string, TransitOption, string]> = [
-  ['Granville Red Line', 'train', '30148'],
-  ['Granville/Broadway bus', 'bus', '14444'],
-  ['Granville/Sheridan bus', 'bus', '1033'],
-];
 
 type GetArrivals = (mode: TransitOption, stopId: string) => Promise<Arrival[]>;
 
@@ -21,10 +17,10 @@ function renderArrival(arrival: Arrival): string {
 
 export async function handleHome(getArrivals: GetArrivals): Promise<Response> {
   const sections = await Promise.all(
-    STOPS.map(async ([title, mode, stopId]) => {
-      const arrivals = (await getArrivals(mode, stopId)).sort((a, b) => a.arrivalTime.getTime() - b.arrivalTime.getTime());
+    STOPS.map(async ({ label, transitType, stopId }) => {
+      const arrivals = (await getArrivals(transitType, stopId)).sort((a, b) => a.arrivalTime.getTime() - b.arrivalTime.getTime());
       const list = arrivals.length > 0 ? `<ul>${arrivals.map(renderArrival).join('')}</ul>` : '<p>No arrivals predicted.</p>';
-      return `<h2>${title}</h2>${list}`;
+      return `<h2>${label}</h2>${list}`;
     }),
   );
 
