@@ -21,8 +21,8 @@ function renderIcon(arrival: Arrival): string {
 }
 
 function renderArrival(arrival: Arrival): string {
-  const routeInfo = arrival.mode === 'bus' ? `<span>${arrival.route}</span>` : '';
-  return `<li>${renderIcon(arrival)} ${routeInfo} <span>${arrival.destination} - ${minutesUntil(arrival)}</span></li>`;
+  const routeInfo = arrival.mode === 'bus' ? `<span>${arrival.route}</span> ` : '';
+  return `<li>${renderIcon(arrival)}${routeInfo}<span>${arrival.destination} - ${minutesUntil(arrival)}</span></li>`;
 }
 
 export async function handleHome(getArrivals: GetArrivals): Promise<Response> {
