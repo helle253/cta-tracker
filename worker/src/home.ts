@@ -50,7 +50,6 @@ export async function handleHome(getArrivals: GetArrivals): Promise<Response> {
 </head>
 <body>
   <h1>CTA arrivals near Granville</h1>
-  <p>Refreshes every ${REFRESH_SECONDS} seconds.</p>
   ${sections.join('\n  ')}
 </body>
 </html>`,
