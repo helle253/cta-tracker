@@ -27,7 +27,9 @@ function renderArrival(arrival: Arrival): string {
 
 export async function handleHome(getArrivals: GetArrivals): Promise<Response> {
   const results = await Promise.allSettled(
-    STOPS.map(async ({ transitType, stopId }) => (await getArrivals(transitType, stopId)).sort((a, b) => a.arrivalTime.getTime() - b.arrivalTime.getTime())),
+    STOPS.map(async ({ transitType, stopId }) =>
+      (await getArrivals(transitType, stopId)).sort((a, b) => a.arrivalTime.getTime() - b.arrivalTime.getTime()),
+    ),
   );
 
   const sections = results.map((result, index) => {
