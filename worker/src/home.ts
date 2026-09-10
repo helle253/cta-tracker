@@ -26,13 +26,16 @@ function renderArrival(arrival: Arrival): string {
 }
 
 export async function handleHome(getArrivals: GetArrivals): Promise<Response> {
-  const sections = await Promise.all(
-    STOPS.map(async ({ label, transitType, stopId }) => {
-      const arrivals = (await getArrivals(transitType, stopId)).sort((a, b) => a.arrivalTime.getTime() - b.arrivalTime.getTime());
-      const list = arrivals.length > 0 ? `<ul>${arrivals.map(renderArrival).join('')}</ul>` : '<p>No arrivals predicted.</p>';
-      return `<h2>${label}</h2>${list}`;
-    }),
+  const results = await Promise.allSettled(
+    STOPS.map(async ({ transitType, stopId }) => (await getArrivals(transitType, stopId)).sort((a, b) => a.arrivalTime.getTime() - b.arrivalTime.getTime())),
   );
+
+  const sections = results.map((result, index) => {
+    const { label } = STOPS[index];
+    if (result.status === 'rejected') return `<h2>${label}</h2><p>Arrivals temporarily unavailable.</p>`;
+    const list = result.value.length > 0 ? `<ul>${result.value.map(renderArrival).join('')}</ul>` : '<p>No arrivals predicted.</p>';
+    return `<h2>${label}</h2>${list}`;
+  });
 
   return new Response(
     `<!doctype html>
